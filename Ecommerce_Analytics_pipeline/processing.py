@@ -1,4 +1,10 @@
 import pandas as pd
+import os
+
+# -------------------------------
+# Ensure 'data' folder exists
+# -------------------------------
+os.makedirs("data", exist_ok=True)
 
 # Path to cleaned Excel
 file_path = r"C:\Users\janani\OneDrive\Documents\excel files\synthetic_ecommerce_dataset_cleaned.xlsx"
@@ -27,7 +33,7 @@ def customer_segmentation():
     rfm.loc[(rfm["Recency"] < 60) & (rfm["Frequency"] >= 2), "Segment"] = "Loyal"
     rfm.loc[rfm["Recency"] > 90, "Segment"] = "Lost"
 
-    rfm.to_csv("01_customer_segmentation.csv", index=False)
+    rfm.to_csv(os.path.join("data", "01_customer_segmentation.csv"), index=False)
     print("Customer Segmentation saved!")
 
 # ---------------------------------------
@@ -38,8 +44,8 @@ def top_products_categories():
     top_products = merged.groupby("product_name")["order_value"].sum().reset_index().sort_values(by="order_value", ascending=False)
     top_categories = merged.groupby("category")["order_value"].sum().reset_index().sort_values(by="order_value", ascending=False)
 
-    top_products.to_csv("02_top_products.csv", index=False)
-    top_categories.to_csv("02_top_categories.csv", index=False)
+    top_products.to_csv(os.path.join("data", "02_top_products.csv"), index=False)
+    top_categories.to_csv(os.path.join("data", "02_top_categories.csv"), index=False)
     print("Top Products & Categories saved!")
 
 # ---------------------------------------
@@ -56,7 +62,7 @@ def customer_demographics():
 
     demographics = merged.groupby(["Age_Group", "gender", "city"])["order_value"].sum().reset_index()
 
-    demographics.to_csv("03_customer_demographics.csv", index=False)
+    demographics.to_csv(os.path.join("data", "03_customer_demographics.csv"), index=False)
     print("Customer Demographics saved!")
 
 # ---------------------------------------
@@ -68,7 +74,7 @@ def customer_loyalty():
 
     loyalty = merged.groupby("loyalty_score")["order_value"].mean().reset_index()
 
-    loyalty.to_csv("04_customer_loyalty.csv", index=False)
+    loyalty.to_csv(os.path.join("data", "04_customer_loyalty.csv"), index=False)
     print("Customer Loyalty saved!")
 
 # ---------------------------------------
@@ -78,7 +84,7 @@ def review_rating_insights():
     merged = reviews.merge(orders, on="customer_id").merge(customers, on="customer_id")
     insights = merged.groupby("rating")["order_value"].mean().reset_index()
 
-    insights.to_csv("05_review_rating_insights.csv", index=False)
+    insights.to_csv(os.path.join("data", "05_review_rating_insights.csv"), index=False)
     print("Review & Rating Insights saved!")
 
 # ---------------------------------------
@@ -99,10 +105,8 @@ def customer_ltv():
     # Rank customers into 3 categories
     ltv["CLV_Category"] = pd.qcut(ltv["CLV_Score"], 3, labels=["Low", "Medium", "High"])
 
-    ltv.to_csv("06_customer_ltv.csv", index=False)
+    ltv.to_csv(os.path.join("data", "06_customer_ltv.csv"), index=False)
     print("Customer LTV saved!")
-
-
 
 # ---------------------------------------
 # 7. Churn Analysis
@@ -113,10 +117,12 @@ def churn_analysis():
     churn["Days_Since_Last_Order"] = (latest_date - churn["order_date"]).dt.days
     churn["Status"] = churn["Days_Since_Last_Order"].apply(lambda x: "Inactive" if x > 90 else "Active")
 
-    churn.to_csv("07_churn_analysis.csv", index=False)
+    churn.to_csv(os.path.join("data", "07_churn_analysis.csv"), index=False)
     print("Churn Analysis saved!")
 
-
+# ---------------------------------------
+# Run all analyses
+# ---------------------------------------
 if __name__ == "__main__":
     customer_segmentation()
     top_products_categories()
@@ -125,4 +131,4 @@ if __name__ == "__main__":
     review_rating_insights()
     customer_ltv()
     churn_analysis()
-    print("\n All project analyses completed and saved as CSV files!")
+    print("\nAll project analyses completed and saved as CSV files in 'data/' folder!")
