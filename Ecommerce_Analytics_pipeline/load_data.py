@@ -1,5 +1,4 @@
-import pandas as pd
-from read_file import read_excel_file
+from Ecommerce_Analytics_pipeline.read_file import read_excel_file
 
 def load_sheets(file_path):
     """Loads all sheets into a dictionary of DataFrames."""
