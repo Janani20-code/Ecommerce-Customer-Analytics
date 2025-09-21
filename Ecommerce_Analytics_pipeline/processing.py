@@ -90,14 +90,18 @@ def customer_ltv():
         "order_id": "count"
     }).reset_index()
 
-    # Use total revenue as CLV score
-    ltv["CLV_Score"] = ltv["order_value"]
+    # Round order_value
+    ltv["order_value"] = ltv["order_value"].round(2)
+
+    # Use total revenue as CLV score (rounded)
+    ltv["CLV_Score"] = ltv["order_value"].round(2)
 
     # Rank customers into 3 categories
     ltv["CLV_Category"] = pd.qcut(ltv["CLV_Score"], 3, labels=["Low", "Medium", "High"])
 
     ltv.to_csv("06_customer_ltv.csv", index=False)
     print("Customer LTV saved!")
+
 
 
 # ---------------------------------------
